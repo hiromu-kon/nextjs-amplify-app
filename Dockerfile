@@ -1,4 +1,4 @@
-FROM --platform=linux/arm64 node:18.4.0-alpine
+FROM node:18.4.0-alpine
 
 RUN mkdir -p /app
 COPY . /app
