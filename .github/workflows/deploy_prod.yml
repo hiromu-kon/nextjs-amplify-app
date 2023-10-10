@@ -1,0 +1,72 @@
+name: Deploy production
+on:
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+
+env:
+  AWS_REGION: ap-northeast-1
+  ECR_REPOSITORY_NAME_APP: terrafom-sample-dev-next-app
+  ECS_CONTAINER_NAME_APP: terrafom-sample-dev-nextjs
+  ECS_SERVICE: terrafom-sample-dev-service
+  ECS_CLUSTER: terrafom-sample-dev-cluster
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+  
+      - name: Build, tag, and push image to ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY_NAME_APP }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: New image ID ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.ECS_CONTAINER_NAME_APP }}
+          image: ${{ steps.build-image.outputs.image }}
+      
+      - name: Deploy ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+      # - name: Run ECS task migration
+      #   id: run-task
+      #   uses: yyoshiki41/ecs-run-task-action@v0.0.8
+      #   with:
+      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
+      #     task-definition-family: app
+      #     cluster: ${{ env.ECS_CLUSTER }}
+      #     subnets: '["subnet-xxxxxx","subnet-xxxxxxx"]'
+      #     security-groups: '["sg-xxxxxx","sg-xxxxxx"]'
+      #     container-name: ${{ env.CONTAINER_NAME }}
+      #     command: '["bundle","exec","rake","db:migrate","RAILS_ENV=staging"]'
