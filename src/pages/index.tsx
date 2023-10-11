@@ -16,7 +16,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Link href='/posts'>post一覧</Link>
-      <main className={`${styles.main} ${inter.className}`}>
+      {/* <main className={`${styles.main} ${inter.className}`}>
         <div className={styles.description}>
           <p>
             Get started by editing&nbsp;
@@ -110,7 +110,7 @@ export default function Home() {
             </p>
           </a>
         </div>
-      </main>
+      </main> */}
     </>
   )
 }

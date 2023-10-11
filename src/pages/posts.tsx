@@ -25,6 +25,5 @@ export default function index({ posts, customKey }: { posts: Posts, customKey: s
 export async function getServerSideProps() {
   const res = await fetch(`https://jsonplaceholder.typicode.com/posts`);
   const posts = await res.json() as Posts;
-  // console.log(posts);
   return { props: { posts, customKey: process.env.KEY } };
 }
