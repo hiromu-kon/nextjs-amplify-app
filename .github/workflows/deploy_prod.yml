@@ -62,14 +62,14 @@ jobs:
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
 
-      # - name: Run ECS task migration
-      #   id: run-task
-      #   uses: yyoshiki41/ecs-run-task-action@v0.0.8
-      #   with:
-      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-      #     task-definition-family: app
-      #     cluster: ${{ env.ECS_CLUSTER }}
-      #     subnets: '["subnet-xxxxxx","subnet-xxxxxxx"]'
-      #     security-groups: '["sg-xxxxxx","sg-xxxxxx"]'
-      #     container-name: ${{ env.CONTAINER_NAME }}
-      #     command: '["bundle","exec","rake","db:migrate","RAILS_ENV=staging"]'
+      - name: Run ECS task migration
+        id: run-task
+        uses: yyoshiki41/ecs-run-task-action@v0.0.8
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          task-definition-family: app
+          cluster: ${{ env.ECS_CLUSTER }}
+          subnets: ${{ secrets.SUBNET_IDS }}
+          security-groups: ${{ secrets.SECURITY_GROUP_IDS }}
+          container-name: ${{ env.ECS_CONTAINER_NAME_APP }}
+          command: '["ls"]'
