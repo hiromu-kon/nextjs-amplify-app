@@ -62,12 +62,12 @@ jobs:
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
 
-      - name: Run ECS task migration
+      - name: Run ECS task command
         id: run-task
         uses: yyoshiki41/ecs-run-task-action@v0.0.8
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          task-definition-family: app
+          task-definition-family: terrafom-sample-dev
           cluster: ${{ env.ECS_CLUSTER }}
           subnets: ${{ secrets.SUBNET_IDS }}
           security-groups: ${{ secrets.SECURITY_GROUP_IDS }}
