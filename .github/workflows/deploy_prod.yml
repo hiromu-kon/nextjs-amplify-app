@@ -67,7 +67,7 @@ jobs:
         uses: yyoshiki41/ecs-run-task-action@v0.0.8
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          task-definition-family: dev-migration
+          task-definition-family: terrafom-sample-dev
           cluster: ${{ env.ECS_CLUSTER }}
           subnets: ${{ secrets.SUBNET_IDS }}
           security-groups: ${{ secrets.SECURITY_GROUP_IDS }}
