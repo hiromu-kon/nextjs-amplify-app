@@ -42,9 +42,12 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
       
-      - name: Download task definition
-        run: |
-          aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }} --query taskDefinition > task-definition.json
+      # - name: Download task definition
+      #   run: |
+      #     aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }} --query taskDefinition > task-definition.json
+      
+      - name: Decode base64 encoded JSON
+        run: echo "${{ secrets.ECS_TASK_DEFINITION }}" | base64 --decode > task-definition.json
 
       - name: New image ID ECS task definition
         id: task-def
@@ -57,7 +60,7 @@ jobs:
       - name: Deploy ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          task-definition: task-definition.json
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
@@ -66,7 +69,7 @@ jobs:
         id: run-task
         uses: yyoshiki41/ecs-run-task-action@v0.0.8
         with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          task-definition: task-definition.json
           task-definition-family: terrafom-sample-dev
           cluster: ${{ env.ECS_CLUSTER }}
           subnets: ${{ secrets.SUBNET_IDS }}
