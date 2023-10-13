@@ -38,6 +38,8 @@
         }
     ],
     "family": "terrafom-sample-dev",
+    "taskRoleArn": "arn:aws:iam::869049726270:role/terrafom-sample-dev_ecs_task",
+    "executionRoleArn": "arn:aws:iam::869049726270:role/terrafom-sample-dev_ecs_task_execution_role",
     "networkMode": "awsvpc",
     "volumes": [],
     "requiresCompatibilities": [
