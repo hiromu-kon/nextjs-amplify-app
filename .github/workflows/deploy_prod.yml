@@ -10,7 +10,7 @@ env:
   ECS_CONTAINER_NAME_APP: nextjs-esc-sample
   ECS_SERVICE: terraform-sample-dev
   ECS_CLUSTER: terrafom-sample-dev-cluster
-  MIGRATE_ECS_TASK_DEFINITION: .github/workflows/migrate-task-definition.json
+  # MIGRATE_ECS_TASK_DEFINITION: .github/workflows/migrate-task-definition.json
 
 jobs:
   deploy:
@@ -47,6 +47,10 @@ jobs:
         run: |
           aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }} --query taskDefinition > task-definition.json
 
+      - name: Download migrate task definition
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ secrets.MIGRATE_ECS_TASK_DEFINITION }} --query taskDefinition > migrate-task-definition.json
+
       - name: New image ID ECS task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
@@ -55,14 +59,14 @@ jobs:
           container-name: ${{ env.ECS_CONTAINER_NAME_APP }}
           image: ${{ steps.build-image.outputs.image }}
 
-      - name: New image ID ECS migration task definition
-        id: migration-task-def
+      - name: New image ID ECS migrate task definition
+        id: migrate-task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: task-definition.json
-          container-name: migration
+          task-definition: migrate-task-definition.json
+          container-name: sample-dev-migration
           image: ${{ steps.build-image.outputs.image }}
-      
+
       - name: Deploy ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
@@ -83,9 +87,9 @@ jobs:
       #     container-name: migration
       #     command: '["echo", "Container is running!"]'
 
-      - name: ECS run migration task
+      - name: ECS run migrate task
         env:
-          task_definition: ${{ steps.migration-task-def.outputs.task-definition }}
+          task_definition: ${{ steps.migrate-task-def.outputs.task-definition }}
           cluster: ${{ env.ECS_CLUSTER }}
           vpc_configuration: '{subnets=${{ secrets.SUBNET_IDS }},securityGroups=${{ secrets.SECURITY_GROUP_IDS }},assignPublicIp=DISABLED}'
           container_overrides: '{"containerOverrides": [{"name": "web", "command": ["echo", "Container is running!"] }]}'
