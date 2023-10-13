@@ -1,0 +1,47 @@
+{
+    "containerDefinitions": [
+        {
+            "name": "nextjs-esc-sample",
+            "image": "869049726270.dkr.ecr.ap-northeast-1.amazonaws.com/terrafom-sample-dev-next-app:8dbb8e7e9bdc57f07c37a868a43dd238409693f3",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "nextjs-esc-sample-3000-tcp",
+                    "containerPort": 3000,
+                    "hostPort": 3000,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "NEXT_PUBLIC_ENVIRONMENT",
+                    "value": "development"
+                },
+                {
+                    "name": "KEY",
+                    "value": "test_key"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/terrafom-sample-dev",
+                    "awslogs-region": "ap-northeast-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        }
+    ],
+    "family": "terrafom-sample-dev",
+    "volumes": [],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "3072"
+}
