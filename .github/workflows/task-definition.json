@@ -38,6 +38,7 @@
         }
     ],
     "family": "terrafom-sample-dev",
+    "networkMode": "awsvpc",
     "volumes": [],
     "requiresCompatibilities": [
         "FARGATE"
