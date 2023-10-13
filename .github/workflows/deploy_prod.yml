@@ -11,6 +11,7 @@ env:
   ECS_SERVICE: terraform-sample-dev
   ECS_CLUSTER: terrafom-sample-dev-cluster
   ECS_TASK_DEFINITION: .github/workflows/task-definition.json
+  MIGRATE_ECS_TASK_DEFINITION: .github/workflows/migrate-task-definition.json
 
 jobs:
   deploy:
@@ -70,7 +71,7 @@ jobs:
         id: run-task
         uses: yyoshiki41/ecs-run-task-action@v0.0.8
         with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          task-definition: ${{ env.MIGRATE_ECS_TASK_DEFINITION }}
           task-definition-family: run-command
           cluster: ${{ env.ECS_CLUSTER }}
           subnets: ${{ secrets.SUBNET_IDS }}
