@@ -87,18 +87,31 @@ jobs:
       #     container-name: migration
       #     command: '["echo", "Container is running!"]'
 
-      - name: ECS run migrate task
-        env:
-          task_definition: ${{ steps.migrate-task-def.outputs.task-definition }}
+      # - name: ECS run migrate task
+      #   env:
+      #     task_definition: ${{ steps.migrate-task-def.outputs.task-definition }}
+      #     cluster: ${{ env.ECS_CLUSTER }}
+      #     vpc_configuration: '{subnets=${{ secrets.SUBNET_IDS }},securityGroups=${{ secrets.SECURITY_GROUP_IDS }},assignPublicIp=DISABLED}'
+      #     container_overrides: '{"containerOverrides": [{"name": "web", "command": ["echo", "Container is running!"] }]}'
+      #   run: |
+      #     task_arn=$(aws ecs run-task \
+      #       --region ap-northeast-1 \
+      #       --launch-type FARGATE \
+      #       --cluster '${{ env.cluster }}' \
+      #       --network-configuration 'awsvpcConfiguration=${{ env.vpc_configuration }}' \
+      #       --task-definition '${{ env.task_definition}}' \
+      #       --overrides '${{ env.container_overrides }}' \
+      #       --query tasks[0].taskArn --output text)
+
+      - name: Run Migrations
+        uses: noelzubin/aws-ecs-run-task@v1.0
+        with:
           cluster: ${{ env.ECS_CLUSTER }}
-          vpc_configuration: '{subnets=${{ secrets.SUBNET_IDS }},securityGroups=${{ secrets.SECURITY_GROUP_IDS }},assignPublicIp=DISABLED}'
-          container_overrides: '{"containerOverrides": [{"name": "web", "command": ["echo", "Container is running!"] }]}'
-        run: |
-          task_arn=$(aws ecs run-task \
-            --region ap-northeast-1 \
-            --launch-type FARGATE \
-            --cluster '${{ env.cluster }}' \
-            --network-configuration 'awsvpcConfiguration=${{ env.vpc_configuration }}' \
-            --task-definition '${{ env.task_definition}}' \
-            --overrides '${{ env.container_overrides }}' \
-            --query tasks[0].taskArn --output text)
+          task-definition: ${{ steps.migrate-task-def.outputs.task-definition }}
+          subnets: ${{ secrets.SUBNET_IDS }}
+          security-groups: ${{ secrets.SECURITY_GROUP_IDS }}
+          assign-public-ip: ENABLED
+          override-container: migration
+          override-container-command: |
+            echo
+            Container is running!
