@@ -92,7 +92,7 @@ jobs:
           task_definition: ${{ steps.task-def.outputs.task-definition }}
           cluster: ${{ env.ECS_CLUSTER }}
           vpc_configuration: '{subnets=${{ secrets.SUBNET_IDS }},securityGroups=${{ secrets.SECURITY_GROUP_IDS }},assignPublicIp=DISABLED}'
-          container_overrides: '{"containerOverrides": [{"name": "web", "command": ["echo", "Container is running!"] }]}'
+          container_overrides: '{"containerOverrides": [{"name": "sample-dev-migration", "command": ["echo", "Container is running!"] }]}'
         run: |
           task_arn=$(aws ecs run-task \
             --region ap-northeast-1 \
