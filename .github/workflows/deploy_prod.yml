@@ -87,12 +87,6 @@ jobs:
       #     container-name: migration
       #     command: '["echo", "Container is running!"]'
 
-      - name: Get latest task definition revision
-        id: latest_revision
-        run: |
-          REVISION=$(aws ecs describe-task-definition --task-definition my-task-family --query 'taskDefinition.revision' --output text)
-          echo "::set-output name=revision::$REVISION"
-
       - name: ECS run migrate task
         env:
           task_definition: ${{ steps.task-def.outputs.task-definition }}
