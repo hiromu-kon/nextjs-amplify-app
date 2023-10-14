@@ -87,6 +87,12 @@ jobs:
       #     container-name: migration
       #     command: '["echo", "Container is running!"]'
 
+      - name: Get latest task definition revision
+        id: latest_revision
+        run: |
+          REVISION=$(aws ecs describe-task-definition --task-definition my-task-family --query 'taskDefinition.revision' --output text)
+          echo "::set-output name=revision::$REVISION"
+
       - name: ECS run migrate task
         env:
           task_definition: ${{ steps.task-def.outputs.task-definition }}
@@ -99,7 +105,7 @@ jobs:
             --launch-type FARGATE \
             --cluster '${{ env.cluster }}' \
             --network-configuration 'awsvpcConfiguration=${{ env.vpc_configuration }}' \
-            --task-definition '${{ env.task_definition}}' \
+            --task-definition 'sample-dev-migration' \
             --overrides '${{ env.container_overrides }}' \
             --query tasks[0].taskArn --output text)
 
