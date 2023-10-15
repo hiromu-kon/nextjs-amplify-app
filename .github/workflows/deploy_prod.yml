@@ -54,20 +54,20 @@ jobs:
           container-name: ${{ env.ECS_CONTAINER_NAME_APP }}
           image: ${{ steps.build-image.outputs.image }}
 
-      - name: Deploy ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ env.ECS_SERVICE }}
-          cluster: ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
+      # - name: Deploy ECS task definition
+      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      #   with:
+      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
+      #     service: ${{ env.ECS_SERVICE }}
+      #     cluster: ${{ env.ECS_CLUSTER }}
+      #     wait-for-service-stability: true
 
       - name: ECS run migrate task
         env:
           task_definition: ${{ secrets.ECS_TASK_DEFINITION }}
           cluster: ${{ env.ECS_CLUSTER }}
           vpc_configuration: '{subnets=${{ secrets.SUBNET_IDS }},securityGroups=${{ secrets.SECURITY_GROUP_IDS }},assignPublicIp=DISABLED}'
-          container_overrides: '{"containerOverrides": [{"name": "nextjs-esc-sample", "command": ["echo", "Container is running!"], "cpu": 512, "memory": 1024 }]}'
+          container_overrides: '{"containerOverrides": [{"name": ${{ env.ECS_CONTAINER_NAME_APP }}, "command": ["echo", "Container is running!"], "cpu": 512, "memory": 1024 }]}'
         run: |
           task_arn=$(aws ecs run-task \
             --region ap-northeast-1 \
