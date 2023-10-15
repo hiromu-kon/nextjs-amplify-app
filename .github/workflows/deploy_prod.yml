@@ -67,7 +67,7 @@ jobs:
           task_definition: ${{ secrets.ECS_TASK_DEFINITION }}
           cluster: ${{ env.ECS_CLUSTER }}
           vpc_configuration: '{subnets=${{ secrets.SUBNET_IDS }},securityGroups=${{ secrets.SECURITY_GROUP_IDS }},assignPublicIp=DISABLED}'
-          container_overrides: '{"containerOverrides": [{"name": ${{ env.ECS_CONTAINER_NAME_APP }}, "command": ["echo", "Container is running!"], "cpu": 512, "memory": 1024 }]}'
+          container_overrides: '{"containerOverrides": [{"name": "${{ env.ECS_CONTAINER_NAME_APP }}", "command": ["echo", "Container is running!"], "cpu": 512, "memory": 1024 }]}'
         run: |
           task_arn=$(aws ecs run-task \
             --region ap-northeast-1 \
